@@ -3,12 +3,20 @@ package timofeeva.learn.time.entity;
 /**
  * Created by toshiba on 24.03.2017.
  */
-public class Test {
+public class Tests {
     private int id;
-    public int number_of_attempts;
-    public int timeLimit;
-    public int ballToPass;
+    private int number_of_attempts;
+    private int timeLimit;
+    private int ballToPass;
     private  int topicId;
+
+    public Tests(int id, int number_of_attempts, int timeLimit, int ballToPass, int topicId) {
+        this.id = id;
+        this.number_of_attempts = number_of_attempts;
+        this.timeLimit = timeLimit;
+        this.ballToPass = ballToPass;
+        this.topicId = topicId;
+    }
 
     public int getId() {
         return id;

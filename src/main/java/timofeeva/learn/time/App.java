@@ -1,24 +1,26 @@
 package timofeeva.learn.time;
 
 import org.flywaydb.core.Flyway;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import timofeeva.learn.time.ui.Login;
+import timofeeva.learn.time.ui.Registration;
+import timofeeva.learn.time.utils.DatabaseUtils;
 
 /**
  * Created by toshiba on 17.03.2017.
  */
 public class App {
-    private static final String URL= "jdbc:mysql://localhost:3306/app_for_learning?createDatabaseIfNotExist=true&autoReconnect=true&useSSL=false";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "root";
+    private static final Logger LOG = LoggerFactory.getLogger(App.class);
+
 
 
     public static void main(String[] args) {
-        Flyway flyway = new Flyway();
-        flyway.setDataSource(URL,USERNAME, PASSWORD);
-        flyway.migrate();
+
+        DatabaseUtils.migrate();
+        LOG.info("Hello logger");
+
+        Login.run();
     }
-
-
-
-
 }
 

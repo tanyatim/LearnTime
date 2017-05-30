@@ -5,8 +5,14 @@ package timofeeva.learn.time.entity;
  */
 public class Questions {
     private  int id;
-    public String question;
+    private String question;
     private  int testId;
+
+    public Questions(int id, String question, int testId) {
+        this.id = id;
+        this.question = question;
+        this.testId = testId;
+    }
 
     public int getId() {
         return id;

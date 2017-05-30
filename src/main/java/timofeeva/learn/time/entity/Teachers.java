@@ -5,12 +5,27 @@ package timofeeva.learn.time.entity;
  */
 public class Teachers {
     private int id;
-    private int password;
-    public String name;
-    public String login;
+    private String password;
+    private String name;
+    private String login;
+    private String eMail;
 
-    public Teachers(int id, int password, String name, String login) {
+
+    public Teachers(){};
+    public Teachers(int id, String password, String name, String login) {
+        this.id = id;
+        this.password = password;
+        this.name = name;
+        this.login = login;
     }
+    public String geteMail() {
+        return eMail;
+    }
+
+    public void seteMail(String eMail) {
+        this.eMail = eMail;
+    }
+
 
     public int getId() {
         return id;
@@ -20,11 +35,11 @@ public class Teachers {
         this.id = id;
     }
 
-    public int getPassword() {
+    public String getPassword() {
         return password;
     }
 
-    public void setPassword(int password) {
+    public void setPassword(String password) {
         this.password = password;
     }
 

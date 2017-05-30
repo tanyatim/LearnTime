@@ -2,13 +2,15 @@ CREATE TABLE students (
 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 name VARCHAR(20),
 login VARCHAR(20),
-pass VARCHAR(20));
+pass VARCHAR(20),
+UNIQUE INDEX `login_UNIQUE` (`login` ASC));
 
 CREATE TABLE teachers (
 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 name VARCHAR(20),
 login VARCHAR(20),
-pass VARCHAR(20));
+pass VARCHAR(20),
+UNIQUE INDEX `login_UNIQUE` (`login` ASC));
 
 CREATE TABLE courses(
 id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
@@ -17,12 +19,14 @@ price INT,
 time VARCHAR(20));
 
 CREATE TABLE student_Course (
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 students_id INT NOT NULL,
 courses_id INT NOT NULL,
 CONSTRAINT student FOREIGN KEY ( students_id ) REFERENCES students (id),
 CONSTRAINT course FOREIGN KEY ( courses_id ) REFERENCES courses ( id ));
 
 CREATE TABLE teacher_Course(
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 teachers_id INT NOT NULL,
 courses_id  INT NOT NULL,
 CONSTRAINT teacher FOREIGN KEY ( teachers_id ) REFERENCES teachers ( id ),
@@ -64,6 +68,7 @@ countBall INT,
 students_id INT NOT NULL);
 
 CREATE TABLE given_answers(
+id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
 answers_id INT NOT NULL,
 testHistory_id INT NOT NULL,
 CONSTRAINT answer FOREIGN KEY ( answers_id ) REFERENCES answers ( id ),

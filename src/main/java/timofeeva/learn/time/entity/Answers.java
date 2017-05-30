@@ -6,8 +6,15 @@ package timofeeva.learn.time.entity;
 public class Answers {
     private int id;
     private String text;
-    public int ball;
+    private int ball;
     private  int questionId;
+
+    public Answers(int id, String text, int ball, int questionId) {
+        this.id = id;
+        this.text = text;
+        this.ball = ball;
+        this.questionId = questionId;
+    }
 
     public int getId() {
         return id;

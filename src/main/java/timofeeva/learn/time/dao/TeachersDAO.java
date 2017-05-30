@@ -1,91 +1,91 @@
 package timofeeva.learn.time.dao;
 
+import timofeeva.learn.time.entity.Students;
 import timofeeva.learn.time.entity.Teachers;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import static timofeeva.learn.time.utils.DatabaseUtils.getConnection;
+
 /**
  * Created by toshiba on 27.03.2017.
  */
-public class TeachersDAO {
-    private static final String URL = "jdbc:mysql://localhost:3306/app_for_learning";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "root";
-    private static final String NEWTEACHER = "INSERT INTO teachers VALUES(id=null, password=?, name=?, login=?)";
-    private static final String ALLTEACHERS = "SELECT * FROM teachers";
-    private static final String IDTEACHER = "SELECT * FROM teachers WHERE id = ?";
-    private static final String UPDATETEACHERS = "UPDATE teachers SET password=?, name=?, login=? WHERE id=?";
-    private static final String DELETETEACHERS = "DELETE FROM teachers WHERE  id=?";
+public class TeachersDAO extends AbstractDAO <Teachers>{
 
-    public List<Teachers> getAllTeachers(){
-        List <Teachers> allTeachers = new ArrayList<>();
-        try(Connection connect = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps = connect.prepareStatement(ALLTEACHERS);
-            ResultSet rs = ps.executeQuery()){
+    @Override
+    protected Teachers resultSetToEntity(ResultSet rs) throws SQLException {
+        Teachers teacher = null;
+        while(rs.next()){
+            teacher = new Teachers();
+            teacher.setId(rs.getInt(1));
+            teacher.setName(rs.getString(2));
+            teacher.setLogin(rs.getString(3));
+            teacher.setPassword(rs.getString(4));
 
-            while (rs.next()){
-                int id = rs.getInt("id");
-                int password = rs.getInt("password");
-                String name = rs.getString("name");
-                String login = rs.getString("login");
-                allTeachers.add(new Teachers(id, password, name, login));
-            }
-        } catch (SQLException e) {
-            System.out.println("can`t load all teachers");
-            e.printStackTrace();
-            return  new ArrayList<>();
+            /*teacher = new Teachers(rs.getInt(1), rs.getString(2),
+                    rs.getString(3), rs.getString(4));*/
         }
-        return allTeachers;
+        return teacher;
     }
 
-    public Teachers getTeacherById(int id){
+    @Override
+    protected String getTableName() {
+        return "teachers";
+    }
+
+    @Override
+    protected String getUpdateQuery() {
+        return "UPDATE teachers SET password=?, name=?, login=? WHERE id=?";
+    }
+
+    @Override
+    public List<Teachers> resultSetToEntities(ResultSet rs) throws SQLException {
+        List <Teachers> teachers = new ArrayList<>();
+        while (rs.next()){
+            Teachers teacher = new Teachers(rs.getInt(1), rs.getString(2),
+                    rs.getString(3), rs.getString(4));
+
+            teachers.add(teacher);
+        }
+        return teachers;
+    }
+
+    @Override
+    protected void updateInsertQuery(PreparedStatement ps, Teachers teachers) throws SQLException {
+        ps.setInt(1, teachers.getId());
+        ps.setString(2, teachers.getPassword());
+        ps.setString(3, teachers.getName());
+        ps.setString(4, teachers.getLogin());
+    }
+
+    @Override
+    protected String getSaveQuery() {
+        return  "INSERT INTO teachers VALUES(null, ?, ?, ?)";
+    }
+
+    @Override
+    protected void saveInsertQuery(PreparedStatement ps, Teachers teachers) throws SQLException {
+        ps.setString(1,teachers.getName());
+        ps.setString(2, teachers.getLogin());
+        ps.setString(3, teachers.getPassword());
+    }
+    public Teachers getByLogin(String login){
+        String query = "SELECT * FROM " + getTableName() + " WHERE login = ?";
         ResultSet rs = null;
-        try(Connection connect = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps = connect.prepareStatement(IDTEACHER)) {
-            ps.setInt(1,id);
+        try(PreparedStatement ps = getConnection().prepareStatement(query)){
+            ps.setString(1, login);
             rs = ps.executeQuery();
-            rs.next();
-            return new Teachers(rs.getInt(1),rs.getInt(2), rs.getString(3), rs.getString(4));
+            return resultSetToEntity(rs);
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally{
+            try{
+                rs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return null;
-    }
-
-    public void saveNewTeacher(Teachers newTeacher) {
-        try (Connection connect = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-             PreparedStatement pr = connect.prepareStatement(NEWTEACHER)) {
-            pr.setString(1, newTeacher.getName());
-            pr.setString(2, newTeacher.getLogin());
-            pr.setInt(3, newTeacher.getPassword());
-            pr.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("");
-        }
-
-    }
-
-    public void updateAllTeachers(Teachers allTeachers){
-        try(Connection connect = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps = connect.prepareStatement(UPDATETEACHERS)){
-            ps.setInt(1, allTeachers.getId());
-            ps.setInt(2, allTeachers.getPassword());
-            ps.setString(3, allTeachers.getName());
-            ps.setString(4, allTeachers.getLogin());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteOldTeachers(Teachers oldTeachers ){
-        try(Connection connect = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps =connect.prepareStatement(DELETETEACHERS)) {
-            ps.setInt(1,oldTeachers.getId());
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
     }
 }

@@ -3,12 +3,20 @@ package timofeeva.learn.time.entity;
 /**
  * Created by toshiba on 24.03.2017.
  */
-public class TestHistory {
+public class TestsHistory {
     private int id;
     public  int numberOfTry;
     public int dateTime;
     public int countBall;
     private int studentId;
+
+    public TestsHistory(int id, int numberOfTry, int dateTime, int countBall, int studentId) {
+        this.id = id;
+        this.numberOfTry = numberOfTry;
+        this.dateTime = dateTime;
+        this.countBall = countBall;
+        this.studentId = studentId;
+    }
 
     public int getId() {
         return id;

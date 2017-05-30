@@ -2,95 +2,87 @@ package timofeeva.learn.time.dao;
 
 import timofeeva.learn.time.entity.Students;
 
+import javax.activation.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import static timofeeva.learn.time.utils.DatabaseUtils.getConnection;
 
 /**
  * Created by toshiba on 24.03.2017.
  */
 
-public class StudentsDAO {
+public class StudentsDAO extends AbstractDAO <Students>{
 
-    private static final String URL = "jdbc:mysql://localhost:3306/app_for_learning";
-    private static final String USERNAME = "root";
-    private static final String PASSWORD = "root";
-    private static final String NEWSTUDENT = "INSERT INTO students VALUES(id=null, password=?, name=?, login=?)";
-    private static final String ALLSTUDENTS = "SELECT * FROM students";
-    private static final String IDSTUDENT = "SELECT * FROM students WHERE id = ?";
-    private static final String UPDATESTUDENTS = "UPDATE students SET password=?, name=?, login=? WHERE id=?";
-    private static final String DELETESTUDENT = "DELETE FROM students WHERE  id=?";
-
-    public List<Students> getAllStudents(){
-        List <Students> allStudents = new ArrayList<>();
-        try(Connection connect = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps = connect.prepareStatement(ALLSTUDENTS);
-            ResultSet rs = ps.executeQuery()){
-
-            while (rs.next()){
-            int id = rs.getInt("id");
-            int password = rs.getInt("password");
-            String name = rs.getString("name");
-            String login = rs.getString("login");
-            allStudents.add(new Students(id, password, name, login));
-            }
-        } catch (SQLException e) {
-            System.out.println("can`t load all students");
-            e.printStackTrace();
-            return  new ArrayList<>();
-        }
-       return allStudents;
+    @Override
+    protected String getTableName() {
+        return "students";
     }
 
-    public Students getStudentById(int id){
+    @Override
+    protected Students resultSetToEntity(ResultSet rs) throws SQLException {
+        Students student = null;
+            while(rs.next()){
+                student = new Students(rs.getInt(1), rs.getString(2),
+                    rs.getString(3), rs.getString(4));
+            }
+        return student;
+    }
+
+
+    @Override
+    protected String getUpdateQuery() {
+       return  "UPDATE students SET password=?, name=?, login=? WHERE id=?";
+    }
+
+    @Override
+    protected List<Students> resultSetToEntities(ResultSet rs) throws SQLException {
+        List <Students> students = new ArrayList<>();
+        while (rs.next()){
+            Students student = new Students(rs.getInt(1), rs.getString(2),
+                    rs.getString(3), rs.getString(4));
+
+            students.add(student);
+        }
+        return students;
+    }
+
+    @Override
+    protected void updateInsertQuery(PreparedStatement ps, Students students) throws SQLException {
+        ps.setInt(1,students.getId());
+        ps.setString(2,students.getPassword());
+        ps.setString(3, students.getName());
+        ps.setString(4, students.getLogin());
+    }
+
+    @Override
+    protected String getSaveQuery() {
+        return "INSERT INTO students VALUES(null, ?, ?, ?)";
+    }
+
+    @Override
+    protected void saveInsertQuery(PreparedStatement ps, Students students ) throws SQLException {
+        ps.setString(1,students.getName());
+        ps.setString(2, students.getLogin());
+        ps.setString(3, students.getPassword());
+    }
+    public Students getByLogin(String login){
+        String query = "SELECT * FROM " + getTableName() + " WHERE login = ?";
         ResultSet rs = null;
-        try(Connection connect = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps = connect.prepareStatement(IDSTUDENT)) {
-            ps.setInt(1,id);
+        try(PreparedStatement ps = getConnection().prepareStatement(query)){
+            ps.setString(1, login);
             rs = ps.executeQuery();
-            rs.next();
-            return new Students(rs.getInt(1),rs.getInt(2), rs.getString(3), rs.getString(4));
+            return resultSetToEntity(rs);
         } catch (SQLException e) {
             e.printStackTrace();
+        }finally{
+            try{
+                rs.close();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
-
-    public void saveNewStudent(Students newStudent) {
-        try (Connection connect = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-             PreparedStatement pr = connect.prepareStatement(NEWSTUDENT)) {
-            pr.setString(1, newStudent.getName());
-            pr.setString(2, newStudent.getLogin());
-            pr.setInt(3, newStudent.getPassword());
-            pr.executeUpdate();
-        } catch (SQLException e) {
-            System.out.println("");
-        }
-
-    }
-
-    public void updateAllStudents(Students allStudents){
-        try(Connection connect = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps = connect.prepareStatement(UPDATESTUDENTS)){
-                ps.setInt(1, allStudents.getId());
-                ps.setInt(2, allStudents.getPassword());
-                ps.setString(3, allStudents.getName());
-                ps.setString(4, allStudents.getLogin());
-                ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteOldStudents( Students oldStudents ){
-        try(Connection connect = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-            PreparedStatement ps =connect.prepareStatement(DELETESTUDENT)) {
-            ps.setInt(oldStudents.getId(), 1);
-            ps.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-
 }
